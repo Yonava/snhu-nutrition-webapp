@@ -1,15 +1,28 @@
 <template>
   <div id="app" class="box">
 
+    <div v-if="toggle === false">
+      <button class="searchbar searchtab" @click="toggle = !toggle">Toggle</button>
+      <h1 class="caloriecounter">Calories:</h1>
+      <h1 :style="{color: rgbs}" class="caloriecounter">
+        {{calories}}
+      </h1>
+      <p class="caloriecounter">Fat:</p>
+      <p class="caloriecounter">Sugar:</p>
+      <p class="caloriecounter">Sodium:</p>
+      <p class="caloriecounter">Crabs:</p>
+
+    </div>
+
     <div v-if="toggle">
 
-      <input type="text" 
+      <button class="searchbar" @click="toggle = !toggle">Toggle</button>
+
+      <input type="text"
       class="searchbar" 
       placeholder="Search Menu Items" 
-      @keyup.enter="print(raw_query)" 
       v-model="raw_query" />
 
-      <div v-if="update()" />
 
       <button class="searchbar lr" @click.left="reset()">CE</button>
 
@@ -46,7 +59,6 @@ export default {
   },
   data: function() {
     return {
-      temp_menu: [],
       raw_query: '',
       calories: 0,
       rgb: [0, 255, 0],
@@ -54,28 +66,47 @@ export default {
       toggle: true, // for toggling between tabs in later versions
       // categories: meal periods(ie lunch)/station+cuisine type/dietary(gluten free, vegetarian, vegan)
       menu: [
-        {item: 'cesaersalad', cals: 350, category: 'lunch/saladbar/gf', name: 'Cesaer Salad'},
-        {item: 'cheesecake', cals: 500, category: 'dessert/justdesserts/vegetarian', name: 'Cheese Cake'},
-        {item: 'veggieburrito', cals: 400, category: 'lunch/dinner/mexican/vegetarian/vegan', name: 'Veggie Burrito'},
-        {item: 'cheesepizza', cals: 300, category: 'lunch/dinner/italian/vegetarian', name: 'Cheese Pizza'},
-        {item: 'bagelwithcreamcheese', cals: 250, category: 'breakfast/jewish/vegetarian', name: 'Bagel w/ CC.'},
-        {item: 'chocolatecake', cals: 600, category: 'dessert/justdesserts/vegetarian', name: 'Chocolate Cake'},
-        {item: 'homestylechickenbowl', cals: 690, category: 'dinner/millcitygrill/gf', name: 'Chicken Bowl'},
-        {item: 'pastapennewithsauce', cals: 700, category: 'dinner/italian', name: 'Penne w/ Sauce'}
-        ]
+        {item: 'cesaersalad', cals: '350', category: 'lunch/saladbar/gf', name: 'Cesaer Salad'},
+        {item: 'cheesecake', cals: '500', category: 'dessert/justdesserts/vegetarian', name: 'Cheese Cake'},
+        {item: 'veggieburrito', cals: '400', category: 'lunch/dinner/mexican/vegetarian/vegan', name: 'Veggie Burrito'},
+        {item: 'cheesepizza', cals: '300', category: 'lunch/dinner/italian/vegetarian', name: 'Cheese Pizza'},
+        {item: 'bagelwithcreamcheese', cals: '250', category: 'breakfast/jewish/vegetarian', name: 'Bagel w/ CC.'},
+        {item: 'chocolatecake', cals: '600', category: 'dessert/justdesserts/vegetarian', name: 'Chocolate Cake'},
+        {item: 'homestylechickenbowl', cals: '690', category: 'dinner/millcitygrill/gf', name: 'Chicken Bowl'},
+        {item: 'pastapennewithsauce', cals: '700', category: 'dinner/italian', name: 'Penne w/ Sauce'},
+        {item: 'test', cals: '200000', category: 'breakfast/dessert/vegan/italian', name: 'Test Case'},
+        ],
+      temp_menu: [
+        // place a copy of the menu in here
+        ],
+    }
+  },
+  watch: {
+    raw_query() {
+      this.update()
     }
   },
   methods: {
+    sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    },
     // add n calories to total
-    increase(n) { 
-      this.calories += n
-      this.colorCalc(this.calories)
+    async increase(n) { 
+     
+      for (let i = 0; i < n; i++) {
+        await this.sleep(.01)
+        this.calories++
+        this.colorCalc(this.calories)
+      }
     },
     // remove n calories from total
-    decrease(n) { 
+    async decrease(n) { 
       if ((this.calories - n) >= 0) {
-        this.calories -= n
+        for (let i = 0; i < n; i++) {
+        await this.sleep(parseInt(n)/100)
+        this.calories--
         this.colorCalc(this.calories)
+        }
       }
       else {
         this.rgbs = `rgb(150, 0, 0)`;
@@ -91,6 +122,19 @@ export default {
     print(x) {
       console.log(x)
     },
+    all(arr) {
+      for (let i = 0; i < arr.length; i++) {
+        if (arr[i] === false) {
+          return false
+        }
+      }
+      return true
+    },
+    getOccurrence(array, value) {
+      let count = 0;
+      array.forEach((v) => (v === value && count++));
+      return count;
+    },
     // adjusts color on calorie number display
     colorCalc(calories) { 
       let percentagegreen = ((1200-calories)/700) * 255;
@@ -105,19 +149,90 @@ export default {
     // sanitizes user inputted search query
     query(raw) { 
       let output = raw.replace(/\s/g, '')
-      return output.toLowerCase()
+      output = output.toLowerCase()
+      if (output.includes('&')) {
+        output = output.split('&')
+      }
+      else {
+        output = [output]
+      }
+      return output
     },
     // updates a revolving subset of menu objects; gives the searchbar functionality
     update() { 
       let call_query = this.query(this.raw_query)
+      let range = []
+      let final = []
+      let cart = []
       this.temp_menu = []
-      for (let i = 0; i < this.menu.length; i++) {
-        if (this.menu[i].item.includes(call_query) ||
-            this.menu[i].category.includes(call_query) || 
-            this.menu[i].name.includes(this.raw_query)) 
-            {
-            this.temp_menu.push(this.menu[i])
-            }
+      for (let t = 0; t < call_query.length; t++) {
+
+        let verdict = false
+
+        for (let i = 0; i < this.menu.length; i++) {
+
+          switch (true) {
+
+            case this.menu[i].item.includes(call_query[t]):
+              verdict = true
+              cart.push(this.menu[i])
+              break
+
+            case this.menu[i].category.includes(call_query[t]):
+              verdict = true
+              cart.push(this.menu[i]) 
+              break
+        
+            case this.menu[i].cals.includes(call_query[t]):
+              verdict = true
+              cart.push(this.menu[i])
+              break
+
+            case call_query[t][0] === '<':
+              if (parseInt(this.menu[i].cals) < parseInt(call_query[t].slice(1))) {
+                verdict = true
+                cart.push(this.menu[i])
+              }
+              break
+
+            case call_query[t][0] === '>':
+              if (parseInt(this.menu[i].cals) > parseInt(call_query[t].slice(1))) {
+                verdict = true
+                cart.push(this.menu[i])
+              }
+              break
+
+            case call_query[t].includes('-'):
+
+              range = call_query[t].split('-')
+
+              if (parseInt(this.menu[i].cals) >= range[0] && parseInt(this.menu[i].cals) <= range[1]) {
+                verdict = true
+                cart.push(this.menu[i])
+              }
+              break  
+          }
+
+        }
+        if (verdict) {
+          final.push(true)
+        }
+        else {
+          final.push(false)
+        }
+        
+      }
+      if (this.all(final)) {
+        let verified = []
+        for (let i = 0; i < cart.length; i++) {
+          if (this.getOccurrence(cart, cart[i]) === call_query.length) {
+            console.log(cart[i].name)
+            verified.push(cart[i])
+          }
+        }
+        let uniq = [...new Set(verified)]
+
+        this.temp_menu = [...uniq]
       }
     }
   }
@@ -129,7 +244,7 @@ export default {
 
 .searchbar {
   margin-top: 5%;
-  margin-left: 5%;
+  margin-left: 4%;
   border-radius: 4px;
   border-style: solid;
   border-color: black;
@@ -183,7 +298,13 @@ export default {
 }
 .lr {
   background-color: rgb(252, 78, 78);
-  width: 50px;
+  width: 40px;
+}
+.searchtab {
+  background-color: khaki;
+}
+.searchtab:hover {
+  background-color: rgb(241, 227, 93);
 }
 .lr:hover {
   background-color: rgb(255, 116, 116);
@@ -207,9 +328,16 @@ export default {
 }
 .box {
   background-color: rgb(214, 212, 221);
-  height: 700px;
   width: 320px;
   margin: 0px;
+}
+.tab {
+  margin-top: 1%;
+  margin-left: 4%;
+  margin-bottom: 1%
+}
+template {
+  margin: none;
 }
 
 </style>
