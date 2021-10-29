@@ -2,43 +2,68 @@
   <div id="app" class="box">
 
     <div v-if="toggle === false">
-      <button class="searchbar searchtab" @click="toggle = !toggle">Toggle</button>
-      <h1 class="caloriecounter">Calories:</h1>
-      <h1 :style="{color: rgbs}" class="caloriecounter">
+      <button class="searchbar searchtab" @click="toggle = !toggle">Add More Items</button>
+      <h1 style="margin-bottom: 1.5%;" class="caloriecounter">Calories:</h1>
+      <h1 style="margin-top: 1.5%;" :style="{color: rgbs}" class="caloriecounter">
         {{calories}}
       </h1>
-      <p class="caloriecounter">Fat:</p>
-      <p class="caloriecounter">Sugar:</p>
-      <p class="caloriecounter">Sodium:</p>
-      <p class="caloriecounter">Crabs:</p>
+
+      <p style="margin-bottom: 1%; margin-top: 1%;" class="caloriecounter">Fat:</p>
+      <p style="margin-bottom: 1%; margin-top: 1%;" :style="{color: rgbs}" class="caloriecounter">{{ calories }}</p>
+      <p style="margin-bottom: 1%; margin-top: 1%;" class="caloriecounter">Sugar:</p>
+      <p style="margin-bottom: 1%; margin-top: 1%;" :style="{color: rgbs}" class="caloriecounter">{{ calories }}</p>
+      <p style="margin-bottom: 1%; margin-top: 1%;" class="caloriecounter">Sodium:</p>
+      <p style="margin-bottom: 1%; margin-top: 1%;" :style="{color: rgbs}" class="caloriecounter">{{ calories }}</p>
+      <p style="margin-bottom: 1%; margin-top: 1%;" class="caloriecounter">Carbs:</p>
+      <p style="margin-bottom: 1%; margin-top: 1%;" :style="{color: rgbs}" class="caloriecounter">{{ calories }}</p>
+
+      <h1 class="caloriecounter">Remove Items:</h1>
+
+      <div v-for="i in total" :key=i.total class="forcontainer containermod">
+
+        <button @click.left="removeTotal(i)" class="menuitems removeitem">{{ i.name }}</button>
+        
+      </div>
+      
+      <p v-if="total.length === 0" class="caloriecounter">Selected Items Show Up Here!</p>
+
 
     </div>
 
     <div v-if="toggle">
 
-      <button class="searchbar" @click="toggle = !toggle">Toggle</button>
+      <header class="box xborder">
 
-      <input type="text"
-      class="searchbar" 
-      placeholder="Search Menu Items" 
-      v-model="raw_query" />
+          <button class="searchbar" @click="toggle = !toggle">Total</button>
+
+          <input type="text"
+          class="searchbar" 
+          placeholder="Search Menu Items" 
+          v-model="raw_query" />
 
 
-      <button class="searchbar lr" @click.left="reset()">CE</button>
+          <button class="searchbar lr" @click.left="reset()">CE</button>
 
-      <p class="caloriecounter">Calories:</p>
-
-      <div class="decision">
+          <p class="caloriecounter">Calories:</p>
+          
+          <div class="decision">
 
           <h1 :style="{color: rgbs}" class="caloriecounter">
             {{calories}}
           </h1>
 
-      </div>
+        </div>
+
+      </header>
+
+
+
+      <div style="margin-bottom: 16px;"></div>
+
 
       <div v-for="i in temp_menu" :key=i.item class="forcontainer">
 
-        <button @click.left="increase(i.cals)" class="menuitems">{{ i.name }}</button>
+        <button @click.left="appendTotal(i)" class="menuitems">{{ i.name }}</button>
 
       </div>
       
@@ -59,6 +84,7 @@ export default {
   },
   data: function() {
     return {
+      total: [],
       raw_query: '',
       calories: 0,
       rgb: [0, 255, 0],
@@ -66,6 +92,19 @@ export default {
       toggle: true, // for toggling between tabs in later versions
       // categories: meal periods(ie lunch)/station+cuisine type/dietary(gluten free, vegetarian, vegan)
       menu: [
+        {item: 'cesaersalad', cals: '350', category: 'lunch/saladbar/gf/vegan',
+        sodium: '30', carbs: '10', name: 'Cesaer Salad'},
+        {item: 'cheesecake', cals: '500', category: 'dessert/justdesserts/vegetarian', name: 'Cheese Cake'},
+        {item: 'veggieburrito', cals: '400', category: 'lunch/dinner/mexican/vegetarian/vegan', name: 'Veggie Burrito'},
+        {item: 'cheesepizza', cals: '300', category: 'lunch/dinner/italian/vegetarian', name: 'Cheese Pizza'},
+        {item: 'bagelwithcreamcheese', cals: '250', category: 'breakfast/jewish/vegetarian', name: 'Bagel w/ CC.'},
+        {item: 'chocolatecake', cals: '600', category: 'dessert/justdesserts/vegetarian', name: 'Chocolate Cake'},
+        {item: 'homestylechickenbowl', cals: '690', category: 'dinner/millcitygrill/gf', name: 'Chicken Bowl'},
+        {item: 'pastapennewithsauce', cals: '700', category: 'dinner/italian', name: 'Penne w/ Sauce'},
+        {item: 'test', cals: '20', category: 'breakfast/dessert/vegan/italian', name: 'Test Case'},
+        ],
+      temp_menu: [
+        // place a copy of the menu in here
         {item: 'cesaersalad', cals: '350', category: 'lunch/saladbar/gf', name: 'Cesaer Salad'},
         {item: 'cheesecake', cals: '500', category: 'dessert/justdesserts/vegetarian', name: 'Cheese Cake'},
         {item: 'veggieburrito', cals: '400', category: 'lunch/dinner/mexican/vegetarian/vegan', name: 'Veggie Burrito'},
@@ -74,10 +113,7 @@ export default {
         {item: 'chocolatecake', cals: '600', category: 'dessert/justdesserts/vegetarian', name: 'Chocolate Cake'},
         {item: 'homestylechickenbowl', cals: '690', category: 'dinner/millcitygrill/gf', name: 'Chicken Bowl'},
         {item: 'pastapennewithsauce', cals: '700', category: 'dinner/italian', name: 'Penne w/ Sauce'},
-        {item: 'test', cals: '200000', category: 'breakfast/dessert/vegan/italian', name: 'Test Case'},
-        ],
-      temp_menu: [
-        // place a copy of the menu in here
+        {item: 'test', cals: '20', category: 'breakfast/dessert/vegan/italian', name: 'Test Case'},
         ],
     }
   },
@@ -94,7 +130,7 @@ export default {
     async increase(n) { 
      
       for (let i = 0; i < n; i++) {
-        await this.sleep(.01)
+        await this.sleep(.1)
         this.calories++
         this.colorCalc(this.calories)
       }
@@ -103,7 +139,7 @@ export default {
     async decrease(n) { 
       if ((this.calories - n) >= 0) {
         for (let i = 0; i < n; i++) {
-        await this.sleep(parseInt(n)/100)
+        await this.sleep(.1)
         this.calories--
         this.colorCalc(this.calories)
         }
@@ -114,13 +150,29 @@ export default {
     },
     // CE (clear) button
     reset() { 
-      this.calories = 0,
-      this.rgb = [0, 255, 0]
-      this.rgbs = 'rgb(0, 0, 0)'
-      this.raw_query = ''
+      location.reload();
+      // this.calories = 0,
+      // this.rgb = [0, 255, 0]
+      // this.rgbs = 'rgb(0, 0, 0)'
+      // this.raw_query = ''
     },
     print(x) {
       console.log(x)
+    },
+    appendTotal(obj) {
+      this.increase(obj.cals)
+      this.total.push(obj)
+    },
+    removeTotal(obj) {
+      this.decrease(obj.cals)
+      this.total.splice(this.findIndex(this.total, obj), 1)
+    },
+    findIndex(arr, item) {
+      for (let i = 0; i < arr.length; i++) {
+        if (arr[i] === item) {
+          return i
+        }
+      }
     },
     all(arr) {
       for (let i = 0; i < arr.length; i++) {
@@ -222,6 +274,7 @@ export default {
         }
         
       }
+      console.log(`Query '${this.raw_query}' Returns: `)
       if (this.all(final)) {
         let verified = []
         for (let i = 0; i < cart.length; i++) {
@@ -300,6 +353,12 @@ export default {
   background-color: rgb(252, 78, 78);
   width: 40px;
 }
+.removeitem {
+  background-color: rgb(253, 122, 122);
+}
+.removeitem:hover {
+  background-color: rgb(250, 84, 84);
+}
 .searchtab {
   background-color: khaki;
 }
@@ -329,12 +388,31 @@ export default {
 .box {
   background-color: rgb(214, 212, 221);
   width: 320px;
+  padding-bottom: 400px;
+  border: 3px solid black;
   margin: 0px;
+}
+.xborder {
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  padding-bottom: 3%;
+}
+body {
+  margin: 3px;
 }
 .tab {
   margin-top: 1%;
   margin-left: 4%;
   margin-bottom: 1%
+}
+.containermod {
+  margin-left: 7px;
+}
+header {
+  position: sticky;
+  top: 0; 
+  width: 320px;
 }
 template {
   margin: none;
