@@ -9,22 +9,29 @@
 
         <div :class="'r '+crate">
 
-          <p class="caloriecounter smalldecision" style="margin-top: 4%;">Sex:</p>
+          <p class="caloriecounter smalldecision" style="margin-top: 4%;">Chromosomes:</p>
 
-          <button class="crate reduced" style="background-color: rgb(73, 197, 255);" v-if="userSex === 'male'" @click.left="userSex = 'male'" :value="'male'">Male</button>
-          <button class="crate reduced" style="background-color: rgb(255,255,255);" v-else @click.left="userSex = 'male'" :value="'male'">Male</button>
-          <button class="crate reduced" style="background-color: rgb(253, 63, 158);" v-if="userSex === 'female'" @click.left="userSex = 'female'" :value="'female'">Female</button>
-          <button class="crate reduced" style="background-color: rgb(255,255,255);" v-else @click.left="userSex = 'female'" :value="'female'">Female</button>
+          <button class="crate reduced" style="background-color: rgb(73, 197, 255);" v-if="userSex === 'male'" @click.left="userSex = 'male'" :value="'male'">XY Person</button>
+          <button class="crate reduced" style="background-color: rgb(255,255,255);" v-else @click.left="userSex = 'male'" :value="'male'">XY Person</button>
+          <button class="crate reduced" style="background-color: rgb(253, 63, 158);" v-if="userSex === 'female'" @click.left="userSex = 'female'" :value="'female'">XX Person</button>
+          <button class="crate reduced" style="background-color: rgb(255,255,255);" v-else @click.left="userSex = 'female'" :value="'female'">XX Person</button>
 
           <p class="caloriecounter smalldecision">Age:</p>
           <input type="number" class="searchbar smalldecision" placeholder="Enter Age" v-model="userAge" />
-          <p class="caloriecounter smalldecision">Weight:</p>
-          <input type="number" style="margin-bottom: 4%;" class="searchbar smalldecision" placeholder="Enter Weight" v-model="userWeight" />
+          <p class="caloriecounter smalldecision" style="width: 200px">Weight (In Pounds):</p>
+          <input type="number" style="margin-bottom: 4%; display: inline;" class="searchbar smalldecision" placeholder="Enter Weight" v-model="userWeight" />
         
         </div>
 
-      <button @click.left="startmenu = false" :class="'total w '+crate">Submit</button>
+      <button v-if="crate === 'crate'" @click.left="error = true"
+      style="margin-top:0%" :class="'total r '+crate">Submit</button>
+
+      <button v-else @click.left="startmenu = false" :class="'total w '+crate">Submit</button>
+
       <button @click.left="startmenu = false" class="total crate">Skip</button>
+
+      <p class="caloriecounter" style="color: red; margin-top: 4%; margin-bottom: 0%;"
+      v-if="error && crate === 'crate'">Incomplete Info</p>
 
     </div>
 
@@ -45,25 +52,25 @@
         </h1>
       </div>
 
-      <p style="margin-bottom: 1%; margin-top: 1%;" class="caloriecounter">Fat:</p>
+      <p style="margin-bottom: 1%; margin-top: 1%;" class="caloriecounter">Total Fat(g):</p>
 
       <div class="decision smalldecision">
         <p style="margin-bottom: 1%; margin-top: 1%;" :style="{color: rgbFat}" class="caloriecounter">{{ fat }}</p>
       </div>
 
-      <p style="margin-bottom: 1%; margin-top: 1%;" class="caloriecounter">Sugar:</p>
+      <p style="margin-bottom: 1%; margin-top: 1%;" class="caloriecounter">Added Sugar(g):</p>
 
       <div class="decision smalldecision">
         <p style="margin-bottom: 1%; margin-top: 1%;" :style="{color: rgbSugar}" class="caloriecounter">{{ sugar }}</p>
       </div>
 
-      <p style="margin-bottom: 1%; margin-top: 1%;" class="caloriecounter">Sodium:</p>
+      <p style="margin-bottom: 1%; margin-top: 1%;" class="caloriecounter">Sodium(mg):</p>
 
       <div class="decision smalldecision">
         <p style="margin-bottom: 1%; margin-top: 1%;" :style="{color: rgbSodium}" class="caloriecounter">{{ sodium }}</p>
       </div>
 
-      <p style="margin-bottom: 1%; margin-top: 1%;" class="caloriecounter">Carbs:</p>
+      <p style="margin-bottom: 1%; margin-top: 1%;" class="caloriecounter">Carbohydrates(g):</p>
 
       <div class="decision smalldecision">
         <p style="margin-bottom: 1%; margin-top: 1%;" :style="{color: rgbCarbs}" class="caloriecounter">{{ carbs }}</p>
@@ -141,14 +148,22 @@ export default {
       userSex: '',
       userAge: '',
       userWeight: '',
+      error: false,
       startmenu: true,
       total: [],
       raw_query: '',
       calories: 0,
+      calrange: [0, 2000, 3000], // range array low, fade green, high * high range calculated by adding 50% to the recommended FDA DV *
       carbs: 0,
+      carbrange: [0, 275, 412.5], // DV 275g
       sodium: 0,
+      sodrange: [0, 2300, 3450], // DV 2300mg
       fat: 0,
+      fatrange: [0, 78, 117], // DV 78g
       sugar: 0,
+      sugrange: [0, 50, 75], // DV 50g
+      fiber: 0,
+      fibrange: [0, 28, 42], // DV 28g
       rgb: [0, 255, 0],
       rgbCals: 'rgb(0, 0, 0)',
       rgbCarbs: 'rgb(0, 0, 0)',
@@ -157,28 +172,28 @@ export default {
       rgbFat: 'rgb(0, 0, 0)',
       toggle: true, // for toggling between tabs in later versions
       // categories: meal periods(ie lunch)/station+cuisine type/dietary(gluten free, vegetarian, vegan)
-      // info array: cals, sodium, carbs, sugar, fat
+      // info array: cals, sodium, carbs, sugar, fat, (fiber(to be added))
       menu: [
-        {item: 'cesaersalad', cals: '350', info: [350, 30, 50, 10, 50], category: 'lunch/saladbar/gf/vegan', name: 'Cesaer Salad'},
-        {item: 'cheesecake', cals: '500', info: [500, 50, 100, 300, 100], category: 'dessert/justdesserts/vegetarian', name: 'Cheese Cake'},
-        {item: 'veggieburrito', cals: '400', info: [400, 20, 70, 0, 40], category: 'lunch/dinner/mexican/vegetarian/vegan', name: 'Veggie Burrito'},
-        {item: 'cheesepizza', cals: '300', info: [300, 300, 500, 10, 200], category: 'lunch/dinner/italian/vegetarian', name: 'Cheese Pizza'},
-        {item: 'bagelwithcreamcheese', cals: '250', info: [250, 30, 50, 10, 200], category: 'breakfast/jewish/vegetarian', name: 'Bagel w/ CC.'},
-        {item: 'chocolatecake', cals: '600', info: [600, 30, 50, 250, 100], category: 'dessert/justdesserts/vegetarian', name: 'Chocolate Cake'},
-        {item: 'homestylechickenbowl', cals: '690', info: [690, 30, 50, 20, 100], category: 'dinner/millcitygrill/gf', name: 'Chicken Bowl'},
-        {item: 'pastapennewithsauce', cals: '700', info: [700, 30, 50, 20, 100], category: 'dinner/italian', name: 'Penne w/ Sauce'},
+        {item: 'cesaersalad', cals: '470', info: [470, 1070, 12, 4, 40], category: 'lunch/saladbar/gf/vegan', name: 'Cesaer Salad'},
+        {item: 'cheesecake', cals: '400', info: [400, 548, 32, 27, 28], category: 'dessert/justdesserts/vegetarian', name: 'Cheese Cake'},
+        {item: 'veggieburrito', cals: '450', info: [450, 985, 71, 0, 12], category: 'lunch/dinner/mexican/vegetarian/vegan', name: 'Veggie Burrito'},
+        {item: 'cheesepizza', cals: '240', info: [240, 540, 34, 1, 7], category: 'lunch/dinner/italian/vegetarian', name: 'Cheese Pizza'},
+        {item: 'bagelwithcreamcheese', cals: '380', info: [380, 534, 57, 9, 11], category: 'breakfast/jewish/vegetarian', name: 'Bagel w/ CC.'},
+        {item: 'chocolatecake', cals: '350', info: [350, 300, 50, 44, 15], category: 'dessert/justdesserts/vegetarian', name: 'Chocolate Cake'},
+        {item: 'homestylechickenbowl', cals: '670', info: [670, 940, 66, 0, 35], category: 'dinner/millcitygrill/gf', name: 'Chicken Bowl'},
+        {item: 'pastapennewithsauce', cals: '300', info: [300, 710, 60, 6, 4], category: 'dinner/italian', name: 'Penne w/ Sauce'},
         {item: 'test', cals: '20', info: [20, 30, 50, 10, 10], category: 'breakfast/dessert/vegan/italian', name: 'Test Case'},
         ],
       temp_menu: [
         // place a copy of the menu in here
-        {item: 'cesaersalad', cals: '350', info: [350, 30, 50, 10, 50], category: 'lunch/saladbar/gf/vegan', name: 'Cesaer Salad'},
-        {item: 'cheesecake', cals: '500', info: [500, 50, 100, 300, 100], category: 'dessert/justdesserts/vegetarian', name: 'Cheese Cake'},
-        {item: 'veggieburrito', cals: '400', info: [400, 20, 70, 0, 40], category: 'lunch/dinner/mexican/vegetarian/vegan', name: 'Veggie Burrito'},
-        {item: 'cheesepizza', cals: '300', info: [300, 300, 500, 10, 200], category: 'lunch/dinner/italian/vegetarian', name: 'Cheese Pizza'},
-        {item: 'bagelwithcreamcheese', cals: '250', info: [250, 30, 50, 10, 200], category: 'breakfast/jewish/vegetarian', name: 'Bagel w/ CC.'},
-        {item: 'chocolatecake', cals: '600', info: [600, 30, 50, 250, 100], category: 'dessert/justdesserts/vegetarian', name: 'Chocolate Cake'},
-        {item: 'homestylechickenbowl', cals: '690', info: [690, 30, 50, 20, 100], category: 'dinner/millcitygrill/gf', name: 'Chicken Bowl'},
-        {item: 'pastapennewithsauce', cals: '700', info: [700, 30, 50, 20, 100], category: 'dinner/italian', name: 'Penne w/ Sauce'},
+        {item: 'cesaersalad', cals: '470', info: [470, 1070, 12, 4, 40], category: 'lunch/saladbar/gf/vegan', name: 'Cesaer Salad'},
+        {item: 'cheesecake', cals: '400', info: [400, 548, 32, 27, 28], category: 'dessert/justdesserts/vegetarian', name: 'Cheese Cake'},
+        {item: 'veggieburrito', cals: '450', info: [450, 985, 71, 0, 12], category: 'lunch/dinner/mexican/vegetarian/vegan', name: 'Veggie Burrito'},
+        {item: 'cheesepizza', cals: '240', info: [240, 540, 34, 1, 7], category: 'lunch/dinner/italian/vegetarian', name: 'Cheese Pizza'},
+        {item: 'bagelwithcreamcheese', cals: '380', info: [380, 534, 57, 9, 11], category: 'breakfast/jewish/vegetarian', name: 'Bagel w/ CC.'},
+        {item: 'chocolatecake', cals: '350', info: [350, 300, 50, 44, 15], category: 'dessert/justdesserts/vegetarian', name: 'Chocolate Cake'},
+        {item: 'homestylechickenbowl', cals: '670', info: [670, 940, 66, 0, 35], category: 'dinner/millcitygrill/gf', name: 'Chicken Bowl'},
+        {item: 'pastapennewithsauce', cals: '300', info: [300, 710, 60, 6, 4], category: 'dinner/italian', name: 'Penne w/ Sauce'},
         {item: 'test', cals: '20', info: [20, 30, 50, 10, 10], category: 'breakfast/dessert/vegan/italian', name: 'Test Case'},
         ],
     }
@@ -200,39 +215,43 @@ export default {
     userSex() {
       if (this.userSex != '' && this.userWeight != '' && this.userAge != '') this.crate = 'crate g'
       else this.crate = 'crate'
+    },
+    async error() {
+      await this.sleep(5000)
+      this.error = false
     }
     },
   methods: {
-    sleep() {
-      return new Promise(resolve => setTimeout(resolve, 1));
+    sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
     },
     // add n calories to total
     async increase(key, n) { 
     
       for (let i = 0; i < n; i++) {
 
-        await this.sleep()
+        await this.sleep(1)
 
         switch (key) {
           case 'calories':
             this.calories++
-            this.colorCalc(key, this.calories)
+            this.colorCalc(key, this.calrange, this.calories)
             break
           case 'carbs':
             this.carbs++
-            this.colorCalc(key, this.carbs)
+            this.colorCalc(key, this.carbrange, this.carbs)
             break
           case 'sodium':
             this.sodium++
-            this.colorCalc(key, this.sodium)
+            this.colorCalc(key, this.sodrange, this.sodium)
             break
           case 'sugar':
             this.sugar++
-            this.colorCalc(key, this.sugar)
+            this.colorCalc(key, this.sugrange, this.sugar)
             break
           case 'fat':
             this.fat++
-            this.colorCalc(key, this.fat)
+            this.colorCalc(key, this.fatrange, this.fat)
             break
         }
         
@@ -243,29 +262,29 @@ export default {
 
       for (let i = 0; i < n; i++) {
 
-          await this.sleep()
+          await this.sleep(1)
 
           switch (key) {
-            case 'calories':
-              this.calories--
-              this.colorCalc(key, this.calories)
-              break
-            case 'carbs':
-              this.carbs--
-              this.colorCalc(key, this.carbs)
-              break
-            case 'sodium':
-              this.sodium--
-              this.colorCalc(key, this.sodium)
-              break
-            case 'sugar':
-              this.sugar--
-              this.colorCalc(key, this.sugar)
-              break
-            case 'fat':
-              this.fat--
-              this.colorCalc(key, this.fat)
-              break
+          case 'calories':
+            this.calories--
+            this.colorCalc(key, this.calrange, this.calories)
+            break
+          case 'carbs':
+            this.carbs--
+            this.colorCalc(key, this.carbrange, this.carbs)
+            break
+          case 'sodium':
+            this.sodium--
+            this.colorCalc(key, this.sodrange, this.sodium)
+            break
+          case 'sugar':
+            this.sugar--
+            this.colorCalc(key, this.sugrange, this.sugar)
+            break
+          case 'fat':
+            this.fat--
+            this.colorCalc(key, this.fatrange, this.fat)
+            break
           }
           
         }
@@ -321,13 +340,13 @@ export default {
       return count;
     },
     // adjusts color on calorie number display
-    colorCalc(key, n) { 
+    colorCalc(key, range, n) { 
       this.rgb = [0, 255, 0]
-      let percentagegreen = ((1200-n)/700) * 255;
-      let percentagered = (n/500) * 255;
+      let percentagegreen = ((range[2]-n)/(range[2]-range[1])) * 255;
+      let percentagered = (n/range[1]) * 255;
       this.rgb[0] = percentagered;
 
-      if (n > 500) {
+      if (n > range[1]) {
         this.rgb[1] = percentagegreen;
       }
 
@@ -518,9 +537,6 @@ export default {
 .searchtab {
   background-color: khaki;
 }
-.searchtab:hover {
-  background-color: rgb(241, 227, 93);
-}
 .lr:hover {
   background-color: rgb(255, 116, 116);
 }
@@ -589,9 +605,6 @@ header {
 }
 .r {
   background-color: rgb(255, 126, 126);
-}
-.w {
-  background-color: white;
 }
 .g {
   background-color: rgb(122, 212, 122);
