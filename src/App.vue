@@ -9,12 +9,12 @@
 
         <div :class="'r '+crate">
 
-          <p class="caloriecounter smalldecision" style="margin-top: 4%;">Chromosomes:</p>
+          <p class="caloriecounter smalldecision" style="margin-top: 4%;">Sex:</p>
 
-          <button class="crate reduced" style="background-color: rgb(73, 197, 255);" v-if="userSex === 'male'" @click.left="userSex = 'male'" :value="'male'">XY Person</button>
-          <button class="crate reduced" style="background-color: rgb(255,255,255);" v-else @click.left="userSex = 'male'" :value="'male'">XY Person</button>
-          <button class="crate reduced" style="background-color: rgb(253, 63, 158);" v-if="userSex === 'female'" @click.left="userSex = 'female'" :value="'female'">XX Person</button>
-          <button class="crate reduced" style="background-color: rgb(255,255,255);" v-else @click.left="userSex = 'female'" :value="'female'">XX Person</button>
+          <button class="crate reduced" style="background-color: rgb(73, 197, 255);" v-if="userSex === 'male'" @click.left="userSex = 'male'" :value="'male'">Male</button>
+          <button class="crate reduced" style="background-color: rgb(255,255,255);" v-else @click.left="userSex = 'male'" :value="'male'">Male</button>
+          <button class="crate reduced" style="background-color: rgb(253, 63, 158);" v-if="userSex === 'female'" @click.left="userSex = 'female'" :value="'female'">Female</button>
+          <button class="crate reduced" style="background-color: rgb(255,255,255);" v-else @click.left="userSex = 'female'" :value="'female'">Female</button>
 
           <p class="caloriecounter smalldecision">Age:</p>
           <input type="number" class="searchbar smalldecision" placeholder="Enter Age" v-model="userAge" />
@@ -26,7 +26,7 @@
       <button v-if="crate === 'crate'" @click.left="error = true"
       style="margin-top:0%" :class="'total r '+crate">Submit</button>
 
-      <button v-else @click.left="startmenu = false" :class="'total w '+crate">Submit</button>
+      <button v-else @click.left="calibrate()" :class="'total w '+crate">Submit</button>
 
       <button @click.left="startmenu = false" class="total crate">Skip</button>
 
@@ -95,12 +95,7 @@
 
           <button class="searchbar" @click="toggle = !toggle">Total</button>
 
-          <input type="search"
-          id="search"
-          class="searchbar" 
-          placeholder="Search Menu Items" 
-          v-model="raw_query" />
-
+          <Search v-bind:menu="menu" v-on:update_temp_menu="display($event)" />
 
           <button class="searchbar lr" @click.left="reset()">CE</button>
 
@@ -136,11 +131,11 @@
 </template>
 
 <script>
-
+import Search from './components/Search'
 export default {
   name: 'App',
   components: {
-
+    Search
   },
   data: function() {
     return {
@@ -148,10 +143,9 @@ export default {
       userSex: '',
       userAge: '',
       userWeight: '',
-      error: false,
+      error: false, 
       startmenu: true,
       total: [],
-      raw_query: '',
       calories: 0,
       calrange: [0, 2000, 3000], // range array low, fade green, high * high range calculated by adding 50% to the recommended FDA DV *
       carbs: 0,
@@ -170,7 +164,7 @@ export default {
       rgbSodium: 'rgb(0, 0, 0)',
       rgbSugar: 'rgb(0, 0, 0)',
       rgbFat: 'rgb(0, 0, 0)',
-      toggle: true, // for toggling between tabs in later versions
+      toggle: true,
       // categories: meal periods(ie lunch)/station+cuisine type/dietary(gluten free, vegetarian, vegan)
       // info array: cals, sodium, carbs, sugar, fat, (fiber(to be added))
       menu: [
@@ -185,7 +179,6 @@ export default {
         {item: 'test', cals: '20', info: [20, 30, 50, 10, 10], category: 'breakfast/dessert/vegan/italian', name: 'Test Case'},
         ],
       temp_menu: [
-        // place a copy of the menu in here
         {item: 'cesaersalad', cals: '470', info: [470, 1070, 12, 4, 40], category: 'lunch/saladbar/gf/vegan', name: 'Cesaer Salad'},
         {item: 'cheesecake', cals: '400', info: [400, 548, 32, 27, 28], category: 'dessert/justdesserts/vegetarian', name: 'Cheese Cake'},
         {item: 'veggieburrito', cals: '450', info: [450, 985, 71, 0, 12], category: 'lunch/dinner/mexican/vegetarian/vegan', name: 'Veggie Burrito'},
@@ -195,13 +188,10 @@ export default {
         {item: 'homestylechickenbowl', cals: '670', info: [670, 940, 66, 0, 35], category: 'dinner/millcitygrill/gf', name: 'Chicken Bowl'},
         {item: 'pastapennewithsauce', cals: '300', info: [300, 710, 60, 6, 4], category: 'dinner/italian', name: 'Penne w/ Sauce'},
         {item: 'test', cals: '20', info: [20, 30, 50, 10, 10], category: 'breakfast/dessert/vegan/italian', name: 'Test Case'},
-        ],
+      ]
     }
   },
   watch: {
-    raw_query() {
-      this.update()
-    },
     userAge() {
       if (this.userAge <= 0) this.userAge = ''
       if (this.userSex != '' && this.userWeight != '' && this.userAge != '') this.crate = 'crate g'
@@ -222,6 +212,9 @@ export default {
     }
     },
   methods: {
+    display(x) {
+      this.temp_menu = x;
+    },
     sleep(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
     },
@@ -301,6 +294,10 @@ export default {
     print(x) {
       console.log(x)
     },
+    calibrate() { // change dv nutrition ranges based on personalization form
+      this.startmenu = false
+      // put formula here for range calibrations
+    },
     appendTotal(obj) {
 
       let keyArray = ['calories', 'sodium', 'carbs', 'sugar', 'fat']
@@ -326,20 +323,7 @@ export default {
         }
       }
     },
-    all(arr) {
-      for (let i = 0; i < arr.length; i++) {
-        if (arr[i] === false) {
-          return false
-        }
-      }
-      return true
-    },
-    getOccurrence(array, value) {
-      let count = 0;
-      array.forEach((v) => (v === value && count++));
-      return count;
-    },
-    // adjusts color on calorie number display
+    // adjusts color on nutrition info display
     colorCalc(key, range, n) { 
       this.rgb = [0, 255, 0]
       let percentagegreen = ((range[2]-n)/(range[2]-range[1])) * 255;
@@ -369,96 +353,8 @@ export default {
 
       }
     },
-    // sanitizes user inputted search query
-    query(raw) { 
-      let output = raw.replace(/\s/g, '')
-      output = output.toLowerCase()
-      if (output.includes('&')) {
-        output = output.split('&')
-      }
-      else {
-        output = [output]
-      }
-      return output
-    },
-    // updates a revolving subset of menu objects; gives the searchbar functionality
-    update() { 
-      let call_query = this.query(this.raw_query)
-      let range = []
-      let final = []
-      let cart = []
-      this.temp_menu = []
-      for (let t = 0; t < call_query.length; t++) {
-
-        let verdict = false
-
-        for (let i = 0; i < this.menu.length; i++) {
-
-          switch (true) {
-
-            case this.menu[i].item.includes(call_query[t]):
-              verdict = true
-              cart.push(this.menu[i])
-              break
-
-            case this.menu[i].category.includes(call_query[t]):
-              verdict = true
-              cart.push(this.menu[i]) 
-              break
-        
-            case this.menu[i].cals.includes(call_query[t]):
-              verdict = true
-              cart.push(this.menu[i])
-              break
-
-            case call_query[t][0] === '<':
-              if (parseInt(this.menu[i].cals) < parseInt(call_query[t].slice(1))) {
-                verdict = true
-                cart.push(this.menu[i])
-              }
-              break
-
-            case call_query[t][0] === '>':
-              if (parseInt(this.menu[i].cals) > parseInt(call_query[t].slice(1))) {
-                verdict = true
-                cart.push(this.menu[i])
-              }
-              break
-
-            case call_query[t].includes('-'):
-
-              range = call_query[t].split('-')
-
-              if (parseInt(this.menu[i].cals) >= range[0] && parseInt(this.menu[i].cals) <= range[1]) {
-                verdict = true
-                cart.push(this.menu[i])
-              }
-              break  
-          }
-
-        }
-        if (verdict) {
-          final.push(true)
-        }
-        else {
-          final.push(false)
-        }
-        
-      }
-      console.log(`Query '${this.raw_query}' Returns: `)
-      if (this.all(final)) {
-        let verified = []
-        for (let i = 0; i < cart.length; i++) {
-          if (this.getOccurrence(cart, cart[i]) === call_query.length) {
-            console.log(cart[i].name)
-            verified.push(cart[i])
-          }
-        }
-        let uniq = [...new Set(verified)]
-
-        this.temp_menu = [...uniq]
-      }
-    }
+   
+    
   }
 }
 
