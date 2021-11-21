@@ -177,7 +177,6 @@ export default {
         {item: 'chocolatecake', cals: '350', info: [350, 300, 50, 44, 15], category: 'dessert/justdesserts/vegetarian', name: 'Chocolate Cake'},
         {item: 'homestylechickenbowl', cals: '670', info: [670, 940, 66, 0, 35], category: 'dinner/millcitygrill/gf', name: 'Chicken Bowl'},
         {item: 'pastapennewithsauce', cals: '300', info: [300, 710, 60, 6, 4], category: 'dinner/italian', name: 'Penne w/ Sauce'},
-        {item: 'test', cals: '20', info: [20, 30, 50, 10, 10], category: 'breakfast/dessert/vegan/italian', name: 'Test Case'},
         ],
       temp_menu: [
         {item: 'cesaersalad', cals: '470', info: [470, 1070, 12, 4, 40], category: 'lunch/saladbar/gf/vegan', name: 'Cesaer Salad'},
@@ -188,7 +187,6 @@ export default {
         {item: 'chocolatecake', cals: '350', info: [350, 300, 50, 44, 15], category: 'dessert/justdesserts/vegetarian', name: 'Chocolate Cake'},
         {item: 'homestylechickenbowl', cals: '670', info: [670, 940, 66, 0, 35], category: 'dinner/millcitygrill/gf', name: 'Chicken Bowl'},
         {item: 'pastapennewithsauce', cals: '300', info: [300, 710, 60, 6, 4], category: 'dinner/italian', name: 'Penne w/ Sauce'},
-        {item: 'test', cals: '20', info: [20, 30, 50, 10, 10], category: 'breakfast/dessert/vegan/italian', name: 'Test Case'},
       ]
     }
   },
@@ -365,6 +363,9 @@ export default {
 #app {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
+body {
+  background-color: rgb(214, 212, 221);
+}
 .searchbar {
   margin-top: 5%;
   margin-left: 4%;
@@ -377,7 +378,6 @@ export default {
 .forcontainer {
   display: inline-flex;
   padding: 1%;
-  margin-left: 4%;
 }
 .searchbar:hover {
   background-color: khaki;
@@ -399,9 +399,8 @@ export default {
   margin-bottom: 1%;
 }
 .menuitems {
-  margin-top: 3%;
-  margin-bottom: 3%;
-  margin-left: 5%;
+  
+  margin: 3%;
   border-color: black;
   height: 40px;
   width: 130px;
@@ -450,20 +449,21 @@ export default {
   background-color: rgb(214, 212, 221);
   width: 320px;
   padding-bottom: 400px;
-  border: 3px solid black;
+  /* border: 3px solid black; */
   border-top: 0px;
   margin: 0px;
 }
 .wborder {
-  border-top: 3px solid black;
+  /* border-top: 3px solid black; */
   top: 0;
   border-collapse: separate;
 }
 .xborder {
   border-left: none;
   border-right: none;
-  border-top: 3px solid black;
+  border-bottom: 3px solid black;
   padding-bottom: 3%;
+  
 }
 body {
   margin: 0px;
