@@ -1,4 +1,5 @@
 <template>
+  <center>
   <div id="app" class="box">
 
 
@@ -127,7 +128,7 @@
     </div>
 
   </div>
-
+</center>
 </template>
 
 <script>
@@ -361,15 +362,16 @@ export default {
 </script>
 
 <style>
-
+#app {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
 .searchbar {
   margin-top: 5%;
   margin-left: 4%;
-  border-radius: 4px;
+  border-radius: 2px;
   border-style: solid;
   border-color: black;
   border-width: 3px;
-  font-family: consolas;
   font-weight: bold;
 }
 .forcontainer {
@@ -382,11 +384,9 @@ export default {
 }
 .caloriecounter {
   font-weight: bold;
-  font-family: consolas;
   margin: 5%;
 }
 .decision {
-  font-family: consolas;
   border: 3px solid #000000;
   margin-top: none;
   margin: 5%;
@@ -406,7 +406,6 @@ export default {
   height: 40px;
   width: 130px;
   border-radius: 3px;
-  font-family: consolas;
   font-weight: bold;
   background-color: white;
   cursor: pointer;
@@ -444,7 +443,6 @@ export default {
   width: 134px;
   font-size: large;
   font-weight: bold;
-  font-family: consolas;
   cursor: pointer;
   background-color: rgb(255, 72, 40)
 }
@@ -496,7 +494,6 @@ header {
   padding: auto;
   border: black solid 3px;
   border-radius: 3px;
-  font-family: consolas;
   font-weight: bold;
 }
 .r {
