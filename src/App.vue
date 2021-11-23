@@ -1,132 +1,77 @@
 <template>
   <center>
   <div id="app" class="box">
-
-
     <div v-if="startmenu" class="wborder">
-
-
         <h1 class="caloriecounter">Personalize:</h1>
-
         <div :class="'r '+crate">
-
           <p class="caloriecounter smalldecision" style="margin-top: 4%;">Sex:</p>
-
-          <button class="crate reduced" style="background-color: rgb(73, 197, 255);" v-if="userSex === 'male'" @click.left="userSex = 'male'" :value="'male'">Male</button>
-          <button class="crate reduced" style="background-color: rgb(255,255,255);" v-else @click.left="userSex = 'male'" :value="'male'">Male</button>
-          <button class="crate reduced" style="background-color: rgb(253, 63, 158);" v-if="userSex === 'female'" @click.left="userSex = 'female'" :value="'female'">Female</button>
-          <button class="crate reduced" style="background-color: rgb(255,255,255);" v-else @click.left="userSex = 'female'" :value="'female'">Female</button>
-
+            <button class="crate reduced" style="background-color: rgb(73, 197, 255);" v-if="userSex === 'male'" @click.left="userSex = 'male'" :value="'male'">Male</button>
+            <button class="crate reduced" style="background-color: rgb(255,255,255);" v-else @click.left="userSex = 'male'" :value="'male'">Male</button>
+            <button class="crate reduced" style="background-color: rgb(253, 63, 158);" v-if="userSex === 'female'" @click.left="userSex = 'female'" :value="'female'">Female</button>
+            <button class="crate reduced" style="background-color: rgb(255,255,255);" v-else @click.left="userSex = 'female'" :value="'female'">Female</button>
           <p class="caloriecounter smalldecision">Age:</p>
           <input type="number" class="searchbar smalldecision" placeholder="Enter Age" v-model="userAge" />
           <p class="caloriecounter smalldecision" style="width: 200px">Weight (In Pounds):</p>
           <input type="number" style="margin-bottom: 4%; display: inline;" class="searchbar smalldecision" placeholder="Enter Weight" v-model="userWeight" />
-        
         </div>
-
       <button v-if="crate === 'crate'" @click.left="error = true"
       style="margin-top:0%" :class="'total r '+crate">Submit</button>
-
       <button v-else @click.left="calibrate()" :class="'total w '+crate">Submit</button>
-
       <button @click.left="startmenu = false" class="total crate">Skip</button>
-
       <p class="caloriecounter" style="color: red; margin-top: 4%; margin-bottom: 0%;"
       v-if="error && crate === 'crate'">Incomplete Info</p>
-
     </div>
-
     <div v-if="toggle === false && startmenu === false">
-
     <header class="box xborder">
-
       <button class="searchbar searchtab" style="margin-top: 3%;" @click="toggle = !toggle">Add More Items</button>
       <button class="searchbar searchtab" style="margin-top: 3%;" @click="startmenu = true">Personalize...</button>
-
     </header>
-
-      <h1 style="margin-bottom: 1.5%;" class="caloriecounter">Calories:</h1>
-      
+      <h1 style="margin-bottom: 1.5%;" class="caloriecounter">Calories:</h1>   
       <div class="decision">
         <h1 :style="{color: rgbCals}" class="caloriecounter">
           {{calories}}
         </h1>
       </div>
-
       <p style="margin-bottom: 1%; margin-top: 1%;" class="caloriecounter">Total Fat(g):</p>
-
       <div class="decision smalldecision">
         <p style="margin-bottom: 1%; margin-top: 1%;" :style="{color: rgbFat}" class="caloriecounter">{{ fat }}</p>
       </div>
-
       <p style="margin-bottom: 1%; margin-top: 1%;" class="caloriecounter">Added Sugar(g):</p>
-
       <div class="decision smalldecision">
         <p style="margin-bottom: 1%; margin-top: 1%;" :style="{color: rgbSugar}" class="caloriecounter">{{ sugar }}</p>
       </div>
-
       <p style="margin-bottom: 1%; margin-top: 1%;" class="caloriecounter">Sodium(mg):</p>
-
       <div class="decision smalldecision">
         <p style="margin-bottom: 1%; margin-top: 1%;" :style="{color: rgbSodium}" class="caloriecounter">{{ sodium }}</p>
       </div>
-
       <p style="margin-bottom: 1%; margin-top: 1%;" class="caloriecounter">Carbohydrates(g):</p>
-
       <div class="decision smalldecision">
         <p style="margin-bottom: 1%; margin-top: 1%;" :style="{color: rgbCarbs}" class="caloriecounter">{{ carbs }}</p>
       </div>
-
       <h1 class="caloriecounter">Remove Items:</h1>
-
       <div v-for="i in total" :key=i.total class="forcontainer containermod">
-
-        <button @click.left="removeTotal(i)" class="menuitems removeitem">{{ i.name }}</button>
-        
-      </div>
-      
+        <button @click.left="removeTotal(i)" class="menuitems removeitem">{{ i.name }}</button>       
+      </div>    
       <p v-if="total.length === 0" class="caloriecounter">Selected Items Show Up Here!</p>
-
-
     </div>
-
     <div v-if="toggle && startmenu === false">
-
       <header class="box xborder">
-
           <button class="searchbar" @click="toggle = !toggle">Total</button>
-
           <Search v-bind:menu="menu" v-on:update_temp_menu="display($event)" />
-
           <button class="searchbar lr" @click.left="reset()">CE</button>
-
-          <p class="caloriecounter">Calories:</p>
-          
+          <p class="caloriecounter">Calories:</p>      
           <div class="decision">
-
           <h1 :style="{color: rgbCals}" class="caloriecounter">
             {{calories}}
           </h1>
-
           </div>
-
       </header>
-
-
-
       <div style="margin-bottom: 16px;"></div>
-
-
       <div v-for="i in temp_menu" :key=i.item class="forcontainer">
-
         <button @click.left="appendTotal(i)" class="menuitems">{{ i.name }}</button>
-
-      </div>
-      
+      </div>      
       <p v-if="temp_menu.length === 0" class="caloriecounter">No Items Found</p>
-
     </div>
-
   </div>
 </center>
 </template>
